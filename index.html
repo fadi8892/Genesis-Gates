@@ -1,0 +1,191 @@
+diff --git a/index.html b/index.html
+new file mode 100644
+index 0000000000000000000000000000000000000000..e61cebbe3ec819d61c0d4480e317d54ad159b431
+--- /dev/null
++++ b/index.html
+@@ -0,0 +1,185 @@
++<!DOCTYPE html>
++<html lang="en">
++<head>
++  <meta charset="UTF-8" />
++  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
++  <title>Genesis Gates | Dashboard</title>
++  <link rel="preconnect" href="https://fonts.googleapis.com" />
++  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
++  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
++  <link rel="stylesheet" href="styles.css" />
++</head>
++<body>
++  <div class="app-shell">
++    <section class="auth-panel" id="auth-panel">
++      <div class="brand">
++        <div class="brand-mark">GG</div>
++        <div>
++          <p class="eyebrow">Welcome back</p>
++          <h1>Genesis Gates Console</h1>
++          <p class="muted">Sign in to access your control center.</p>
++        </div>
++      </div>
++      <form class="auth-form" id="login-form">
++        <label>
++          <span>Email</span>
++          <input type="email" name="email" placeholder="you@example.com" required />
++        </label>
++        <label>
++          <span>Password</span>
++          <input type="password" name="password" placeholder="••••••••" required />
++        </label>
++        <div class="form-footer">
++          <label class="remember">
++            <input type="checkbox" name="remember" />
++            <span>Remember me</span>
++          </label>
++          <a class="link" href="#">Forgot password?</a>
++        </div>
++        <button type="submit" class="primary">Sign in</button>
++        <p class="muted small">By continuing you agree to the acceptable use policy.</p>
++      </form>
++    </section>
++
++    <main class="dashboard" id="dashboard" hidden>
++      <header class="topbar">
++        <div>
++          <p class="eyebrow">Dashboard</p>
++          <h2 id="welcome">Welcome back</h2>
++        </div>
++        <div class="actions">
++          <button class="ghost" id="refresh-btn">Refresh</button>
++          <div class="divider"></div>
++          <div class="user-chip" id="user-chip">
++            <div class="avatar" id="avatar">GG</div>
++            <div>
++              <p class="chip-name" id="chip-name">User</p>
++              <p class="chip-role">Operations</p>
++            </div>
++          </div>
++          <button class="ghost" id="logout-btn">Logout</button>
++        </div>
++      </header>
++
++      <section class="grid">
++        <article class="card highlight">
++          <div class="card-head">
++            <p class="eyebrow">Revenue</p>
++            <span class="pill positive">+12.4%</span>
++          </div>
++          <h3>$482,400</h3>
++          <p class="muted">Month-to-date performance across all business lines.</p>
++          <svg viewBox="0 0 320 80" class="sparkline" aria-hidden="true">
++            <polyline points="0,70 40,55 80,60 120,45 160,50 200,35 240,40 280,30 320,35" />
++          </svg>
++        </article>
++
++        <article class="card">
++          <div class="card-head">
++            <p class="eyebrow">Active users</p>
++            <span class="pill neutral">+4.1%</span>
++          </div>
++          <h3>12,840</h3>
++          <p class="muted">Past 24 hours</p>
++          <div class="progress" aria-hidden="true">
++            <div class="progress-bar" style="width: 68%"></div>
++          </div>
++        </article>
++
++        <article class="card">
++          <div class="card-head">
++            <p class="eyebrow">Net promoter</p>
++            <span class="pill positive">+2.8%</span>
++          </div>
++          <h3>68</h3>
++          <p class="muted">Sustained promoter score over the last quarter.</p>
++        </article>
++
++        <article class="card">
++          <div class="card-head">
++            <p class="eyebrow">Conversion</p>
++            <span class="pill warning">-1.2%</span>
++          </div>
++          <h3>7.4%</h3>
++          <p class="muted">Checkout funnel completion rate week over week.</p>
++          <div class="meter">
++            <span style="width: 74%"></span>
++          </div>
++        </article>
++      </section>
++
++      <section class="grid two-column">
++        <article class="card">
++          <div class="card-head">
++            <p class="eyebrow">Pipeline</p>
++            <a class="link" href="#">View all</a>
++          </div>
++          <ul class="list">
++            <li>
++              <div>
++                <p class="title">Enterprise rollout</p>
++                <p class="muted small">Deployment across three regions</p>
++              </div>
++              <span class="pill soft">In review</span>
++            </li>
++            <li>
++              <div>
++                <p class="title">Data lake migration</p>
++                <p class="muted small">Modernizing ingestion flows</p>
++              </div>
++              <span class="pill positive">On track</span>
++            </li>
++            <li>
++              <div>
++                <p class="title">Customer success desk</p>
++                <p class="muted small">New automation playbooks</p>
++              </div>
++              <span class="pill neutral">Planned</span>
++            </li>
++          </ul>
++        </article>
++
++        <article class="card">
++          <div class="card-head">
++            <p class="eyebrow">Tasks</p>
++            <a class="link" href="#">Organize</a>
++          </div>
++          <div class="tasks" id="task-list">
++            <!-- Tasks rendered via JS -->
++          </div>
++          <form class="task-form" id="task-form">
++            <input type="text" name="task" placeholder="Add a follow-up item" required />
++            <button type="submit" class="primary">Add</button>
++          </form>
++        </article>
++      </section>
++
++      <section class="grid three-column">
++        <article class="card compact">
++          <div class="card-head">
++            <p class="eyebrow">Service uptime</p>
++            <span class="pill positive">99.98%</span>
++          </div>
++          <p class="muted">Rolling 30-day availability.</p>
++        </article>
++        <article class="card compact">
++          <div class="card-head">
++            <p class="eyebrow">Support SLA</p>
++            <span class="pill neutral">1h 12m</span>
++          </div>
++          <p class="muted">Median first response time.</p>
++        </article>
++        <article class="card compact">
++          <div class="card-head">
++            <p class="eyebrow">Churn risk</p>
++            <span class="pill warning">3 accounts</span>
++          </div>
++          <p class="muted">Flagged for proactive outreach.</p>
++        </article>
++      </section>
++    </main>
++  </div>
++
++  <script src="app.js"></script>
++</body>
++</html>

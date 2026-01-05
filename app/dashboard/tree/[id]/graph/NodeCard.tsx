@@ -54,14 +54,28 @@ export const NodeCard = memo(({ data, selected }: NodeProps<any>) => {
       <Handle 
         type="target" 
         position={Position.Top} 
-        className="!w-full !h-8 !opacity-0 !-top-4 !bg-transparent rounded-none border-none" 
+               className="!w-3 !h-3 !opacity-100 !-top-3 !rounded-full !border-2 !border-[#0c0c0c] shadow-lg"
+        style={{ background: accent }}
+      />
+      {/* Spouse / lateral connectors (kept subtle for now) */}
+      <Handle 
+        type="source" 
+        position={Position.Left} 
+        className="!w-2.5 !h-2.5 !opacity-60 !-left-3 !rounded-full !border-2 !border-[#0c0c0c]"
+        style={{ background: `${accent}99` }}
+      />
+      <Handle 
+        type="target" 
+        position={Position.Right} 
+        className="!w-2.5 !h-2.5 !opacity-60 !-right-3 !rounded-full !border-2 !border-[#0c0c0c]"
+        style={{ background: `${accent}99` }}
       />
       {/* Children attach to Bottom */}
       <Handle 
         type="source" 
         position={Position.Bottom} 
-        className="!w-full !h-8 !opacity-0 !-bottom-4 !bg-transparent rounded-none border-none" 
-      />
+        className="!w-3 !h-3 !opacity-100 !-bottom-3 !rounded-full !border-2 !border-[#0c0c0c] shadow-lg" 
+        style={{ background: accent }}
     </div>
   );
 });

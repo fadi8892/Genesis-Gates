@@ -135,7 +135,8 @@ export default function TreeClient({ treeId, initialData }: Props) {
                                 <GraphView 
                                     key={mode + (activePersonId || 'root')} 
                                     data={graphDataToRender as GraphData} 
-                                    onOpenSidebar={handleSelectPerson} 
+                                     onOpenSidebar={handleSelectPerson}
+                                    mode={mode === 'view' ? 'view' : 'editor'} 
                                 />
                             </ReactFlowProvider>
                         )}

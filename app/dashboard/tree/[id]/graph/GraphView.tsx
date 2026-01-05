@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import ReactFlow, {
   Background,
   useNodesState,
@@ -14,10 +14,10 @@ import ReactFlow, {
 } from "reactflow";
 import "reactflow/dist/style.css";
 import { NodeCard } from "./NodeCard";
-import { Search, RotateCcw, Maximize, Minus, Plus } from "lucide-react"; 
+import { Search, RotateCcw, Minus, Plus, ArrowDown, ArrowRight, Circle, Fan } from "lucide-react"; 
 import { motion, AnimatePresence } from "framer-motion";
 import type { GraphData } from "./types";
-import { computeLayout } from "./layout"; 
+import { computeLayout, LayoutMode } from "./layout"; 
 
 const nodeTypes = { person: NodeCard };
 
@@ -45,41 +45,85 @@ const sanitizeNode = (node: any) => {
     };
 };
 
-export default function GraphView({ data, onOpenSidebar }: { data: GraphData, onOpenSidebar: (id: string) => void }) {
+type GraphMode = "view" | "editor";
+
+export default function GraphView({ data, onOpenSidebar, mode }: { data: GraphData, onOpenSidebar: (id: string) => void, mode: GraphMode }) {
   const { fitView, zoomIn, zoomOut, setCenter } = useReactFlow();
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const [showSearch, setShowSearch] = useState(false);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [isReady, setIsReady] = useState(false);
+  const [layoutMode, setLayoutMode] = useState<LayoutMode>(() => {
+    if (typeof window === "undefined") return "vertical";
+    const saved = localStorage.getItem("gg-layout-mode");
+    return (saved as LayoutMode) || "vertical";
+  });
+
+  const effectiveLayout: LayoutMode = mode === "view" ? layoutMode : "vertical";
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    localStorage.setItem("gg-layout-mode", layoutMode);
+  }, [layoutMode]);
+
+  const rawNodes: Node[] = useMemo(() => data.nodes.map((n: any) => ({
+      id: n.id,
+      type: "person", 
+      position: { x: 0, y: 0 }, 
+      data: { 
+          ...n.data, 
+          label: resolveName(n),
+          accent: n.data?.accent || "#3b82f6"
+      }
+  })), [data.nodes]);
+
+  const rawEdges: Edge[] = useMemo(() => data.edges.map((e: any) => ({
+    id: e.id,
+    source: e.source, 
+    target: e.target,
+    type: 'step', // Strict orthogonal lines
+    animated: false,
+    style: { stroke: '#444', strokeWidth: 2 },
+  })), [data.edges]);
+  const [layoutMode, setLayoutMode] = useState<LayoutMode>(() => {
+    if (typeof window === "undefined") return "vertical";
+    const saved = localStorage.getItem("gg-layout-mode");
+    return (saved as LayoutMode) || "vertical";
+  });
+
+  const effectiveLayout: LayoutMode = mode === "view" ? layoutMode : "vertical";
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    localStorage.setItem("gg-layout-mode", layoutMode);
+  }, [layoutMode]);
+
+  const rawNodes: Node[] = useMemo(() => data.nodes.map((n: any) => ({
+      id: n.id,
+      type: "person", 
+      position: { x: 0, y: 0 }, 
+      data: { 
+          ...n.data, 
+          label: resolveName(n),
+          accent: n.data?.accent || "#3b82f6"
+      }
+  })), [data.nodes]);
+
+  const rawEdges: Edge[] = useMemo(() => data.edges.map((e: any) => ({
+    id: e.id,
+    source: e.source, 
+    target: e.target,
+    type: 'step', // Strict orthogonal lines
+    animated: false,
+    style: { stroke: '#444', strokeWidth: 2 },
+  })), [data.edges]);
 
   // --- LOAD & LAYOUT ---
   useEffect(() => {
     if (!data) return;
 
-    // 1. Map Data
-    const rawNodes: Node[] = data.nodes.map((n: any) => ({
-        id: n.id,
-        type: "person", 
-        position: { x: 0, y: 0 }, 
-        data: { 
-            ...n.data, 
-            label: resolveName(n),
-            accent: n.data?.accent || "#3b82f6"
-        }
-    }));
-
-    const rawEdges: Edge[] = data.edges.map((e: any) => ({
-      id: e.id,
-      source: e.source, 
-      target: e.target,
-      type: 'step', // Strict orthogonal lines
-      animated: false,
-      style: { stroke: '#444', strokeWidth: 2 },
-    }));
-
-    // 2. Compute Layout & Sanitize
-    const layoutNodes = computeLayout(rawNodes, rawEdges).map(sanitizeNode);
+        const layoutNodes = computeLayout(rawNodes, rawEdges, effectiveLayout).map(sanitizeNode);
     
     setNodes(layoutNodes);
     setEdges(rawEdges);
@@ -89,7 +133,7 @@ export default function GraphView({ data, onOpenSidebar }: { data: GraphData, on
     if (layoutNodes.length > 0) {
         setTimeout(() => fitView({ duration: 800, padding: 0.2 }), 50);
     }
-  }, [data]);
+  }, [data, rawNodes, rawEdges, effectiveLayout, fitView]);
 
   // --- INTERACTIONS ---
   const handleNodeClick = useCallback((_: any, node: Node) => {
@@ -117,6 +161,37 @@ export default function GraphView({ data, onOpenSidebar }: { data: GraphData, on
       >
         {isReady && <Background color="#1a1a1a" gap={40} size={1} />}
         
+        <Panel position="top-right" className="mt-4 mr-4">
+            {mode === "view" && (
+              <div className="flex items-center gap-2 p-2 bg-black/80 border border-white/10 rounded-2xl shadow-2xl backdrop-blur">
+                <span className="text-[11px] font-semibold uppercase tracking-[0.2em] text-white/40 mr-1">Layout</span>
+                <button
+                  onClick={() => setLayoutMode("vertical")}
+                  className={`px-3 py-2 rounded-xl text-sm font-bold flex items-center gap-2 transition-colors ${layoutMode === "vertical" ? "bg-white text-black" : "bg-white/5 text-white/70 hover:bg-white/10"}`}
+                >
+                  <ArrowDown className="w-4 h-4" /> Vertical
+                </button>
+                <button
+                  onClick={() => setLayoutMode("horizontal")}
+                  className={`px-3 py-2 rounded-xl text-sm font-bold flex items-center gap-2 transition-colors ${layoutMode === "horizontal" ? "bg-white text-black" : "bg-white/5 text-white/70 hover:bg-white/10"}`}
+                >
+                  <ArrowRight className="w-4 h-4" /> Horizontal
+                </button>
+                <button
+                  onClick={() => setLayoutMode("circular")}
+                  className={`px-3 py-2 rounded-xl text-sm font-bold flex items-center gap-2 transition-colors ${layoutMode === "circular" ? "bg-white text-black" : "bg-white/5 text-white/70 hover:bg-white/10"}`}
+                >
+                  <Circle className="w-4 h-4" /> Circular
+                </button>
+                <button
+                  onClick={() => setLayoutMode("fan")}
+                  className={`px-3 py-2 rounded-xl text-sm font-bold flex items-center gap-2 transition-colors ${layoutMode === "fan" ? "bg-white text-black" : "bg-white/5 text-white/70 hover:bg-white/10"}`}
+                >
+                  <Fan className="w-4 h-4" /> Fan
+                </button>
+              </div>
+            )}
+        </Panel>
         <Panel position="bottom-center" className="mb-10">
             <div className="flex items-center gap-1 p-2 bg-black/80 backdrop-blur-md border border-white/10 rounded-2xl shadow-2xl">
                  <button onClick={() => setShowSearch(!showSearch)} className="p-3 hover:bg-white/10 rounded-xl text-white/50 hover:text-white transition-colors"><Search className="w-5 h-5" /></button>

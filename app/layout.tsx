@@ -5,20 +5,14 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Genesis Gates",
-  description: "The Future of Digital Assets",
+  title: "Genesis Gates | Dashboard",
+  description: "Professional post-login dashboard experience for Genesis Gates.",
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={inter.className}>
-      <body className="min-h-screen bg-surface text-white antialiased">
-        {children}
-      </body>
+    <html lang="en">
+      <body className={inter.className}>{children}</body>
     </html>
   );
 }
